@@ -11,11 +11,20 @@ public class VisualiseDividedGraph extends JFrame {
        Okno.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
        Okno.setSize(1600, 900);
 
-       ArrayList<Node> nodes = File.readFile(file_path);
+       GraphData graphData = File.readFile(file_path);
+       ArrayList<Node> nodes = graphData.getNodes();
+       ArrayList<ArrayList<Integer>> adjacencyList = graphData.getAdjacencyList();
 
        //Dodanie panelu do rysowania
-       GraphPanel panel = new GraphPanel(nodes);
-       Okno.add(panel);
+       GraphPanel panel = new GraphPanel(nodes, adjacencyList);
+
+       // Wrap the panel in a scroll pane to enable scrolling when the graph is too large
+       JScrollPane scrollPane = new JScrollPane(panel);
+       scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+       scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+       // Add the scroll pane to the frame instead of the panel directly
+       Okno.add(scrollPane);
 
        Okno.setVisible(true);
    }
