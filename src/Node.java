@@ -14,9 +14,10 @@ public class Node
      * Debug method: Prints node information to console
      * Outputs the node number, coordinates, and group
      */
+
     public void printNode()
     {
-        System.out.println(nr + ": " + x + " x " + y + "group: " + group);
+        System.out.println(nr + ": " + x + " x " + y + " group: " + group);
     }
 
     public int getX() { return x; }
