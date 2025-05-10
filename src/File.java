@@ -1,6 +1,8 @@
 import java.awt.*;
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -224,6 +226,8 @@ public class File
             return new GraphData(new ArrayList<>(), new ArrayList<>());
         }
     }
+
+
 
     private static GraphData readNewFormatFile(String file_path)
     {
@@ -631,4 +635,39 @@ public class File
 
         return new GraphData(nodes, adjacencyList);
     }
+
+
+    public static String[][] readGraph(String filePath){
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+
+            String line;
+            String[][] content = new String[5][];
+            int lineCount = 0;
+
+
+            while ((line = br.readLine()) != null) {
+
+                content[lineCount] = line.split(";");
+
+                lineCount++;
+            }
+
+            System.out.println(content[0][0]);
+            System.out.println(content[1][1]);
+            System.out.println(content[2][2]);
+            System.out.println(content[3][3]);
+            System.out.println(content[4][4]);
+
+            return content;
+
+        } catch (IOException | NumberFormatException e) {
+            System.err.println("Błąd: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
+
+
 }
