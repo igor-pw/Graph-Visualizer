@@ -1,9 +1,14 @@
 public class Matrix {
     private double[][] matrix;
-    private int size;
+    private final int size;
 
     public Matrix(int size) {
         matrix = new double[size][size];
+        this.size = size;
+    }
+
+    public Matrix(double[][] matrix, int size) {
+        this.matrix = matrix;
         this.size = size;
     }
 
@@ -20,7 +25,7 @@ public class Matrix {
         this.matrix = matrix;
     }
 
-    public void memMatrix(String[][] content){
+    /*public void memMatrix(String[][] content){
         for(int i = 1; i< content[4].length; i++){
             int am = Integer.parseInt(content[4][i]) - Integer.parseInt(content[4][i-1]);
             if(am != 0){
@@ -31,26 +36,24 @@ public class Matrix {
                 }
             }
         }
-    }
+    }*/
 
+    public Matrix multiplyMatrix(Matrix rightMatrix) {
+        int n = this.size;
+        double[][] left = this.getMatrix();
+        double[][] right = rightMatrix.getMatrix();
+        double[][] result = new double[n][n];
 
-
-    public void test(int l){
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                matrix[i][j] = 1+(i+j)*l;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                for (int k = 0; k < n; k++) {
+                    result[i][j] += left[i][k] * right[k][j];
+                }
             }
         }
-        printMatrix();
+        return new Matrix(result, n);
     }
 
-    public void multiplyMatrix(Matrix matrix) {
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                this.matrix[i][j] *= matrix.matrix[i][j];
-            }
-        }
-    }
 
     public void copyMatrix(Matrix matrix) {
         this.matrix = matrix.matrix;

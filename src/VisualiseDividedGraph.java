@@ -18,12 +18,11 @@ public class VisualiseDividedGraph extends JFrame {
        //Dodanie panelu do rysowania
        GraphPanel panel = new GraphPanel(nodes, adjacencyList);
 
-       // Wrap the panel in a scroll pane to enable scrolling when the graph is too large
+       //Dodanie suwaka
        JScrollPane scrollPane = new JScrollPane(panel);
        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
-       // Add the scroll pane to the frame instead of the panel directly
        Okno.add(scrollPane);
 
        Okno.setVisible(true);

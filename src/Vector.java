@@ -1,75 +1,51 @@
+import java.util.ArrayList;
 
-public class Vector {
-    private double vec[];
-    private int size;
+public class Vector extends ArrayList<Double>
+{
     private double norm;
 
-    public Vector(int size) {
-        this.size=size;
-        vec = new double[size];
-    }
-
-    public void test(int l){
-        for(int i=0;i<size;i++){
-            vec[i]=(i+1)*l;
-        }
-        printVec();
-    }
-
-    public void printVec(){
-        for(int i=0;i<size;i++){
-            System.out.print(vec[i]+" ");
-        }
-    }
-
-    public double vectorNorm(){
-        double norm=0;
-        for(int i=0;i<size;i++){
-            norm+=vec[i]*vec[i];
+    public void vectorNorm(){
+        double norm = 0;
+        for(Double value : this){
+            norm += value*value;
         }
         norm = Math.sqrt(norm);
-        this.norm= norm;
-        return norm;
+        this.norm = norm;
     }
 
-    public void multiplyMatrixByVector(Matrix matrix ){
-        double tmpVec[];
-        tmpVec = new double[size];
+    public void multiplyMatrixByVector(Matrix matrix )
+    {
+        ArrayList<Double> result_vec = new ArrayList<Double>(this.size());
+        double value = 0;
 
-        for(int i=0;i<size;i++){
-            for(int j=0;j<size;j++){
-                tmpVec[i]+=vec[j]*matrix.getMatrix()[i][j];
+        for(int i = 0; i < this.size(); i++){
+            for(int j = 0; j < this.size(); j++){
+                value += this.get(j)*matrix.getMatrix()[i][j];
             }
+            result_vec.add(value);
+            value=0;
         }
-        vec=tmpVec;
+        this.clear();
+        this.addAll(result_vec);
     }
 
-    public void multiplyVecByVec(Vector V){
-        for(int i=0;i<size;i++) {
-            vec[i] *= V.vec[i];
-        }
-    }
-
-    public void subtractVector(Vector v){
-        for(int i=0;i<size;i++){
-            vec[i]-=v.vec[i];
+    public void multiplyVecByVec(Vector vec){
+        for(int i = 0; i < this.size(); i++){
+            this.set(i, this.get(i)*vec.get(i));
         }
     }
 
-    public void divideVector(Vector V){
-        for(int i=0;i<size;i++){
-            vec[i]/=V.vec[i];
+    public void subtractVector(Vector vec){
+        for(int i = 0; i < this.size(); i++){
+            this.set(i, this.get(i)-vec.get(i));
         }
     }
 
-    public void copyVector(Vector V){
-        for (int i = 0; i < size; i++) {
-            vec=V.vec;
+    public void divideVector(Vector vec){
+        for(int i = 0; i < this.size(); i++){
+            this.set(i, this.get(i)/vec.get(i));
         }
     }
 
-    public double[] getVec(){
-        return vec;
-    }
-
+    public double getNorm() { return norm; }
 }

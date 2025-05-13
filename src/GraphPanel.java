@@ -16,19 +16,19 @@ public class GraphPanel extends JPanel {
     @Override
     public Dimension getPreferredSize() {
         if (nodes == null || nodes.isEmpty()) {
-            return new Dimension(800, 600); // Domyślny rozmiar, jeśli nie ma węzłów
+            return new Dimension(800, 600);
         }
 
-        // Znajdź maksymalne współrzędne x i y wśród wszystkich węzłów
-        int maxX = 0;
-        int maxY = 0;
+        //Szukanie maksymalnych współrzędnych x i y wśród wszystkich węzłów
+        int max_X = 0;
+        int max_Y = 0;
         for (Node node : nodes) {
-            maxX = Math.max(maxX, node.getX());
-            maxY = Math.max(maxY, node.getY());
+            max_X = Math.max(max_X, node.getX());
+            max_Y = Math.max(max_Y, node.getY());
         }
 
-        // Dodaj rozmiar węzła (20x20) i trochę marginesu
-        return new Dimension(maxX + 20 + 50, maxY + 20 + 50);
+        //Dodanie rozmiar węzła z marginesem
+        return new Dimension(max_X + 20 + 50, max_Y + 20 + 50);
     }
 
     @Override
@@ -38,30 +38,27 @@ public class GraphPanel extends JPanel {
 
         setBackground(Color.WHITE);
 
-        // Zdefiniuj kolory dla różnych grup
+        //Kolory dla grup
         Color[] groupColors = {
             Color.RED, Color.BLUE, Color.GREEN, Color.ORANGE, 
             Color.MAGENTA, Color.CYAN, Color.PINK, Color.YELLOW
         };
 
-        // Rysuj krawędzie między połączonymi węzłami
+        //Rysowanie krawędzie między połączonymi węzłami
         for (int i = 0; i < nodes.size(); i++) {
             Node node1 = nodes.get(i);
-            // Pobierz punkt środkowy węzła
+
             int x1 = node1.getX() + 10;
             int y1 = node1.getY() + 10;
 
-            // Ustaw kolor krawędzi na podstawie grupy węzła źródłowego
             int group = node1.getGroup();
             if (group >= 0) {
-                // Użyj modulo, aby cyklicznie przechodzić przez kolory, jeśli jest więcej grup niż kolorów
                 g.setColor(groupColors[group % groupColors.length]);
             } else {
                 // Domyślny kolor dla węzłów bez grupy
                 g.setColor(Color.BLACK);
             }
 
-            // Rysuj linie do wszystkich połączonych węzłów
             if (i < adjacencyList.size()) {
                 for (Integer connectedNodeIndex : adjacencyList.get(i)) {
                     if (connectedNodeIndex < nodes.size()) {
@@ -74,27 +71,19 @@ public class GraphPanel extends JPanel {
             }
         }
 
-        // Narysuj każdy węzeł kolorem opartym na jego grupie
+        //Rysowanie węzłów
         for (Node node : nodes) {
             int group = node.getGroup();
             if (group >= 0) {
-                // Użyj modulo, aby cyklicznie przechodzić przez kolory, jeśli jest więcej grup niż kolorów
                 g.setColor(groupColors[group % groupColors.length]);
             } else {
-                // Domyślny kolor dla węzłów bez grupy
                 g.setColor(Color.BLACK);
             }
-            // Zwiększ rozmiar węzła z 15x15 do 20x20
             g.fillOval(node.getX(), node.getY(), 20, 20);
 
-            // Narysuj numer węzła dla odniesienia
-            // Dostosuj pozycję etykiety, aby pasowała do nowego rozmiaru węzła
             g.setColor(Color.WHITE);
             g.drawString(String.valueOf(node.getNr()), node.getX() + 7, node.getY() + 15);
         }
 
-        // Sekcja debugowania: Wypisuje informacje o wszystkich węzłach do konsoli
-        // Pomaga w debugowaniu pozycji węzłów i przypisań do grup
-        //for (Node node : nodes) node.printNode();
     }
 }

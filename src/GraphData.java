@@ -1,8 +1,5 @@
 import java.util.ArrayList;
 
-/**
- * Class to hold both the nodes and the adjacency list for a graph
- */
 public class GraphData {
     private final ArrayList<Node> nodes;
     private final ArrayList<ArrayList<Integer>> adjacencyList;

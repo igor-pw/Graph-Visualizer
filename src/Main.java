@@ -7,39 +7,85 @@ public class Main {
         String file_path = args[0];
 
         String[][] content = File.readGraph(file_path);
-        int nodes =content[1].length;
+
+        // Check if content[1] exists and has elements
+        if (content[1] == null || content[1].length == 0) {
+            System.err.println("Error: content[1] is null or empty. Cannot proceed.");
+            return;
+        }
+
+        // Calculate the maximum possible node index from content[2]
+        int maxNodeIndex = 0;
+        for (int i = 0; i < content[2].length; i++) {
+            try {
+                int index = Integer.parseInt(content[2][i]);
+                if (index > maxNodeIndex) {
+                    maxNodeIndex = index;
+                }
+            } catch (NumberFormatException e) {
+                System.err.println("Error parsing content[2][" + i + "]: " + e.getMessage());
+            }
+        }
+
+        // Use the larger of content[1].length and maxNodeIndex for the node array size
+        int nodes = Math.max(content[1].length, maxNodeIndex + 1);
+        System.out.println("content[1].length = " + content[1].length + ", maxNodeIndex = " + maxNodeIndex);
+        System.out.println("Using nodes = " + nodes);
+
         Node[] node = new Node[nodes];
-        System.out.println("Nodes: " + nodes);
         Matrix A_matrix = new Matrix(nodes);
 
         // można przenieść gdzieś indziej jako funkcja
-        int dim = Integer.parseInt(content[0][0]);
+        // Parse the dimension from the header line which has format "S numGroups width height"
+        String[] headerParts = content[0][0].split(" ");
+        int dim = Integer.parseInt(headerParts[1]);
         int line = 0;
         int num = 0;
         for(int i=1;i< content[2].length;i++){
             int am = Integer.parseInt(content[2][i]) - Integer.parseInt(content[2][i-1]);
             if(am != 0){
-                for(int j=Integer.parseInt(content[2][i-1]);j<Integer.parseInt(content[2][i]);j++) {
-                    node[num] = new Node(Integer.parseInt(content[1][j]),line,-1,num);
-                    num++;
+                // Calculate the range of indices to process
+                int startIdx = Integer.parseInt(content[2][i-1]);
+                int endIdx = Integer.parseInt(content[2][i]);
+
+                // Debug output
+                System.out.println("Processing range: " + startIdx + " to " + endIdx + 
+                                  " (content[1].length = " + content[1].length + ")");
+
+                // Process only valid indices
+                for(int j = startIdx; j < endIdx; j++) {
+                    // Skip invalid indices
+                    if (j >= content[1].length || j < 0) {
+                        System.out.println("Skipping index " + j + " (out of bounds)");
+                        continue;
+                    }
+
+                    try {
+                        // Special case: if content[1] has only one element, use it for all nodes
+                        if (content[1].length == 1) {
+                            // Use the single value from content[1] for all nodes
+                            node[num] = new Node(Integer.parseInt(content[1][0]), line, -1, num);
+                            System.out.println("Created node " + num + " using content[1][0] = " + content[1][0]);
+                        } else {
+                            // Normal case: use the value from content[1][j]
+                            node[num] = new Node(Integer.parseInt(content[1][j]), line, -1, num);
+                        }
+                        num++;
+                    } catch (Exception e) {
+                        System.err.println("Error processing index " + j + ": " + e.getMessage());
+                    }
                 }
             }
             line++;
         }
 
-        A_matrix.memMatrix(content);
+        //A_matrix.memMatrix(content);
 
-
-
-       // A_matrix.printMatrix();
-
-
-        //
-
-
+        // Visualize the graph
+        VisualiseDividedGraph.VisualiseGraph(file_path);
 
         /*
-       // VisualiseDividedGraph.VisualiseGraph(file_path);
+        // A_matrix.printMatrix();
         System.out.println();
         Matrix matrix_a = new Matrix(10);
         matrix_a.test(1);

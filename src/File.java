@@ -645,18 +645,27 @@ public class File
             int lineCount = 0;
 
 
-            while ((line = br.readLine()) != null) {
+            while ((line = br.readLine()) != null && lineCount < 5) {
+                // Check if the line is empty
+                if (line.trim().isEmpty()) {
+                    continue;
+                }
 
+                // Split the line by semicolons
                 content[lineCount] = line.split(";");
+
+                // Debug output to see what's being read
+                System.out.println("Line " + lineCount + " has " + content[lineCount].length + " elements");
 
                 lineCount++;
             }
 
-            System.out.println(content[0][0]);
-            System.out.println(content[1][1]);
-            System.out.println(content[2][2]);
-            System.out.println(content[3][3]);
-            System.out.println(content[4][4]);
+            // Print content safely with index checks
+            if (content[0] != null && content[0].length > 0) System.out.println("content[0][0]: " + content[0][0]);
+            if (content[1] != null) System.out.println("content[1] length: " + content[1].length);
+            if (content[2] != null) System.out.println("content[2] length: " + content[2].length);
+            if (content[3] != null) System.out.println("content[3] length: " + content[3].length);
+            if (content[4] != null) System.out.println("content[4] length: " + content[4].length);
 
             return content;
 
