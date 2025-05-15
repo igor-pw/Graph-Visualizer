@@ -1,0 +1,126 @@
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class ParseData
+{
+    public static GraphData readFile(String file_path)
+    {
+        try(BufferedReader br = new BufferedReader(new FileReader(file_path)))
+        {
+            String line1 = br.readLine();
+
+            if(line1.startsWith("S") || line1.startsWith("F"))
+            {
+                String line2 = br.readLine();
+
+                int size = Integer.parseInt(line2);
+                String[] parts = line1.trim().split("\\s+");
+
+                int groups = Integer.parseInt(parts[1]);
+                return readGraph(br, groups);
+            }
+
+            else
+            {
+                int size = Integer.parseInt(line1);
+                return readGraph(br, 0);
+            }
+        }
+        catch(IOException e)
+        {
+            System.out.println("Error reading file: " + e.getMessage());
+        }
+
+        return null;
+    }
+
+    private static GraphData readGraph(BufferedReader br, int groups) throws IOException
+    {
+        String line1 = br.readLine();
+        String line2 = br.readLine();
+
+        Scanner sc1 = new Scanner(line1);
+        Scanner sc2 = new Scanner(line2);
+
+        sc1.useDelimiter(";");
+        sc2.useDelimiter(";");
+
+        int first = sc2.nextInt();
+        int node_counter = 0;
+        int x = 0;
+
+        ArrayList<Node> nodes = new ArrayList<>();
+
+        while(sc2.hasNextInt())
+        {
+            int last = sc2.nextInt();
+
+            for(int i = first; i < last; i++)
+            {
+                if(sc1.hasNextInt())
+                {
+                    int y = sc1.nextInt();
+                    Node node = new Node(x, y, -1, node_counter);
+                    nodes.add(node);
+                    node_counter++;
+                }
+            }
+
+            x++;
+            first = last;
+        }
+
+        nodes.trimToSize();
+
+        sc1.close();
+        sc2.close();
+
+        line1 = br.readLine();
+        line2 = br.readLine();
+
+        sc1 = new Scanner(line1);
+        sc2 = new Scanner(line2);
+
+        sc1.useDelimiter(";");
+        sc2.useDelimiter(";");
+
+        ArrayList<ArrayList<Integer>> adjacency_matrix = new ArrayList<>(node_counter);
+
+        for(int i = 0; i < node_counter; i++) {
+            ArrayList<Integer> row = new ArrayList<>(node_counter);
+            for (int j = 0; j < node_counter; j++) {
+                row.add(0);
+            }
+            adjacency_matrix.add(row);
+        }
+
+        first = sc2.nextInt();
+        int y;
+
+        while(sc2.hasNextInt())
+        {
+            int last = sc2.nextInt();
+            x = sc1.nextInt();
+
+            //poprawnic zeby odczytywalo polaczenia ostatniego wierzcholka!!!
+            for(int i = first; i < last-1; i++)
+            {
+                if(sc1.hasNextInt())
+                {
+                    y = sc1.nextInt();
+                    adjacency_matrix.get(x).set(y, 1);
+                    adjacency_matrix.get(y).set(x, 1);
+                }
+            }
+            first = last;
+        }
+
+        sc1.close();
+        sc2.close();
+
+        return new GraphData(nodes, adjacency_matrix, groups);
+    }
+}
