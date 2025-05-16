@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 
+
 public class Matrix {
 
     private final int size;
@@ -33,6 +34,79 @@ public class Matrix {
 
         matrix.get(size-1).set(size-1, alfa_coeffs.getLast());
     }
+
+    public void calculateEigenvalues(Matrix orthogonal_matrix, int n, int i)
+    {
+        Matrix givens_matrix = new Matrix(n);
+        givens_matrix.createGivensMatrix(this, n, i);
+        Matrix upper_triangular_matrix = new Matrix(n);
+        upper_triangular_matrix.multiplyMatrixByMatrix(givens_matrix, this, n);
+        this.copyMatrix(upper_triangular_matrix);
+        givens_matrix.transposeMatrix();
+        upper_triangular_matrix = null;
+        if(i == 0){
+            orthogonal_matrix.copyMatrix(givens_matrix);
+        }
+        else{
+            Matrix new_orthogonal_matrix = new Matrix(n);
+            new_orthogonal_matrix.multiplyMatrixByMatrix(orthogonal_matrix, givens_matrix, n);
+            orthogonal_matrix.copyMatrix(new_orthogonal_matrix);
+            new_orthogonal_matrix = null;
+        }
+
+        givens_matrix = null;
+        i++;
+
+        if(i<n-1)
+            this.calculateEigenvalues(orthogonal_matrix, n, i);
+        else if(i == n-1)
+        {
+            Matrix new_tridiagonal_matrix = new Matrix(n);
+            new_tridiagonal_matrix.multiplyMatrixByMatrix(this, orthogonal_matrix, n);
+            this.copyMatrix(new_tridiagonal_matrix);
+            new_tridiagonal_matrix = null;
+        }
+    }
+
+    public void transposeMatrix(){
+        for(int i = 0; i < this.size; i++){
+            for(int j = i; j < this.size; j++){
+                double temp = this.matrix.get(i).get(j);
+                this.matrix.get(i).set(j, this.matrix.get(j).get(i));
+                this.matrix.get(j).set(i, temp);
+            }
+        }
+    }
+
+    public void createGivensMatrix(Matrix tridiagonal_matrix, int n, int x)
+    {
+        double r = Math.sqrt(Math.pow(tridiagonal_matrix.getValue(x, x), 2) + Math.pow(tridiagonal_matrix.getValue(x+1, x), 2));
+        double sin = tridiagonal_matrix.getValue(x+1, x) / r;  // Zmienione z (x, x+1) na (x+1, x)
+        double cos = tridiagonal_matrix.getValue(x, x) / r;
+        for(int i = 0; i<n; i++){
+            this.matrix.get(i).set(i,1.0);
+        }
+        this.matrix.get(x).set(x,cos);
+        this.matrix.get(x+1).set(x+1,cos);
+        this.matrix.get(x).set(x+1,sin);
+        this.matrix.get(x+1).set(x,-sin);
+
+    }
+
+    public void multiplyMatrixByMatrix(Matrix martix_a, Matrix matrix_b, int n){
+        for(int i = 0; i < n ; i ++){
+            for(int j = 0; j < n; j++){
+                double sum = 0;
+                for(int k = 0; k < n; k++){
+                    sum += martix_a.getValue(i, k) * matrix_b.getValue(k, j);
+                }
+                this.matrix.get(i).set(j, sum);
+            }
+        }
+
+    }
+
+
 
     public void printMatrix()
     {
@@ -73,6 +147,10 @@ public class Matrix {
 
     public int getSize() {
         return size;
+    }
+
+    public double getValue(int y, int x){
+        return matrix.get(y).get(x);
     }
 
 }

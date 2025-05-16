@@ -18,7 +18,7 @@ public class Main {
         SpectralData spectral_data = new SpectralData(graph_data.getNodes());
         spectral_data.getDegreeVector().norm();
 
-        spectral_data.getLaplaceMatrix().printCSR();
+        //spectral_data.getLaplaceMatrix().printCSR();
 
         if(graph_data.getGroups() > 0)
         {
@@ -56,6 +56,14 @@ public class Main {
 
         alfa_coeffs = null;
         beta_coeffs = null;
+
+        Matrix orthogonal_matrix = new Matrix(iterations);
+        for(int i =0; i <iterations/2; i++){
+            tridiagonal_matrix.calculateEigenvalues(orthogonal_matrix, iterations, 0);
+        }
+        orthogonal_matrix = null;
+
+        tridiagonal_matrix.printMatrix();
 
     }
 }
