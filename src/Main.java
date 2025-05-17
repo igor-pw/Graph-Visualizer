@@ -1,11 +1,12 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Objects;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        int iterations = 50;
+        int iterations = 57;
 
         String file_path = args[0];
 
@@ -54,8 +55,40 @@ public class Main {
         Matrix tridiagonal_matrix = new Matrix(iterations);
         tridiagonal_matrix.createTridiagonalMatrix(alfa_coeffs, beta_coeffs, iterations);
 
+	    Matrix orthogonal_matrix = new Matrix(iterations);
+
         alfa_coeffs = null;
         beta_coeffs = null;
+
+        Vector eigenvalue_vector = new Vector(iterations, 0.0);
+        eigenvalue_vector.createEigenvalueVector(tridiagonal_matrix, orthogonal_matrix, 0);
+
+        //eigenvalue_vector.print();
+
+        tridiagonal_matrix = null;
+        orthogonal_matrix = null;
+
+        double eigenvalue = eigenvalue_vector.getFirst();
+
+       for(int i = 1; i < eigenvalue_vector.size(); i++)
+       {
+            if(eigenvalue_vector.get(i) < eigenvalue && eigenvalue_vector.get(i) > 0) {
+                eigenvalue = eigenvalue_vector.get(i);
+            }
+       }
+
+       eigenvalue_vector = null;
+
+       System.out.println("min eigenvalue: " + eigenvalue);
+
+       for(int i = 0; i < spectral_data.getLaplaceMatrix().getValues().size(); i++)
+       {
+           if(spectral_data.getLaplaceMatrix().getValues().get(i) > 0) {
+               spectral_data.getLaplaceMatrix().getValues().set(i, spectral_data.getLaplaceMatrix().getValues().get(i) - eigenvalue);
+           }
+       }
+
+       //metoda gradientowa i fajrant
 
     }
 }

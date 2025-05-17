@@ -1,19 +1,23 @@
 import java.util.ArrayList;
 
-public class Vector extends ArrayList<Double>
-{
+public class Vector extends ArrayList<Double> {
     private double norm;
 
-    public Vector()
-    {
+    public Vector() {
         super();
     }
 
-    public Vector(int size)
-    {
+    public Vector(int size) {
         super(size);
     }
 
+    public Vector(int size, double value)
+    {
+        super(size);
+        for(int i = 0; i < size; i++) {
+            this.add(value);
+        }
+    }
     public double getNorm() { return norm; }
 
     public void norm(){
@@ -42,7 +46,7 @@ public class Vector extends ArrayList<Double>
 
         for(int i = 0; i < this.size(); i++)
         {
-            double value = 0;
+            double value = 0.0;
             for(int j = csr.getRowPointer().get(i); j < csr.getRowPointer().get(i+1); j++) {
                 value += csr.getValues().get(j)*this.get(csr.getColIndex().get(j));
             }
@@ -51,6 +55,45 @@ public class Vector extends ArrayList<Double>
         }
 
         return result_vector;
+    }
+
+    public void createEigenvalueVector(Matrix tridiagonal_matrix, Matrix orthogonal_matrix, int k)
+    {
+        Matrix givens_matrix = new Matrix(tridiagonal_matrix.getSize());
+        givens_matrix.createGivensMatrix(tridiagonal_matrix, k);
+
+        //givens_matrix.printMatrix();
+
+        Matrix upper_triangular_matrix = givens_matrix.multiplyMatrix(tridiagonal_matrix);
+
+        //upper_triangular_matrix.printMatrix();
+
+        tridiagonal_matrix.setValues(upper_triangular_matrix.getValues());
+        upper_triangular_matrix = null;
+
+        givens_matrix.transposeMatrix();
+
+        if(k == 0){
+            orthogonal_matrix.setValues(givens_matrix.getValues());
+        }
+
+        else {
+            orthogonal_matrix = orthogonal_matrix.multiplyMatrix(givens_matrix);
+        }
+
+        givens_matrix = null;
+        k++;
+
+        if(k < this.size()-1) {
+            this.createEigenvalueVector(tridiagonal_matrix, orthogonal_matrix, k);
+        }
+
+        else if(k == this.size()-1)
+        {
+            for(int i = 0; i < this.size(); i++){
+                this.set(i, tridiagonal_matrix.getValues().get(i).get(i));
+            }
+        }
     }
 
     /*public void multiplyMatrixByVector(Matrix matrix )
