@@ -77,9 +77,18 @@ public class Main {
             }
        }
 
+       for(int i = 0; i < spectral_data.getLaplaceMatrix().getValues().size(); i++)
+       {
+           if(spectral_data.getLaplaceMatrix().getValues().get(i) > 0) {
+               spectral_data.getLaplaceMatrix().getValues().set(i, spectral_data.getLaplaceMatrix().getValues().get(i) - eigenvalue);
+           }
+       }
+
        eigenvalue_vector = null;
 
        System.out.println("min eigenvalue: " + eigenvalue);
+
+       eigenvalue = 1.0;
 
        for(int i = 0; i < spectral_data.getLaplaceMatrix().getValues().size(); i++)
        {
@@ -88,7 +97,14 @@ public class Main {
            }
        }
 
-       //metoda gradientowa i fajrant
+        Vector velocity = new Vector(spectral_data.getEigenvector().size(), 0.0);
+        spectral_data.setEigenvector(initial_vector);
 
+        do
+        {
+            spectral_data.calculateEigenvector(velocity, 0.0, 0);
+        } while (spectral_data.getEpsilon() > spectral_data.getEpsilonMargin());
+
+        spectral_data.getEigenvector().print();
     }
 }

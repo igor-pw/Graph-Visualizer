@@ -64,7 +64,7 @@ public class Vector extends ArrayList<Double> {
 
         //givens_matrix.printMatrix();
 
-        Matrix upper_triangular_matrix = givens_matrix.multiplyMatrix(tridiagonal_matrix);
+        Matrix upper_triangular_matrix = givens_matrix.multiplyByMatrix(tridiagonal_matrix);
 
         //upper_triangular_matrix.printMatrix();
 
@@ -78,7 +78,7 @@ public class Vector extends ArrayList<Double> {
         }
 
         else {
-            orthogonal_matrix = orthogonal_matrix.multiplyMatrix(givens_matrix);
+            orthogonal_matrix = orthogonal_matrix.multiplyByMatrix(givens_matrix);
         }
 
         givens_matrix = null;
@@ -95,6 +95,7 @@ public class Vector extends ArrayList<Double> {
             }
         }
     }
+
 
     /*public void multiplyMatrixByVector(Matrix matrix )
     {

@@ -67,7 +67,7 @@ public class Matrix {
         }
     }
 
-    public Matrix multiplyMatrix(Matrix right_matrix)
+    public Matrix multiplyByMatrix(Matrix right_matrix)
       {
         Matrix result_matrix = new Matrix(size);
 
