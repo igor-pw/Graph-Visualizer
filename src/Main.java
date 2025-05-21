@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Objects;
 
 public class Main {
@@ -19,14 +17,14 @@ public class Main {
         SpectralData spectral_data = new SpectralData(graph_data.getNodes());
         spectral_data.getDegreeVector().norm();
 
-        spectral_data.getLaplaceMatrix().printCSR();
+        //spectral_data.getLaplaceMatrix().printCSR();
 
         if(graph_data.getGroups() > 0)
         {
             int groups = 0;
             for (int j = 0; j < graph_data.getNodes().size(); j++) {
                 if (graph_data.getNodes().get(j).getGroup() == -1 && !graph_data.getNodes().get(j).getAdjacencyList().isEmpty()) {
-                    graph_data.assignGroups(graph_data.getNodes().get(j), groups);
+                    graph_data.inintGroups(graph_data.getNodes().get(j), groups);
                     groups++;
                 }
             }
@@ -86,7 +84,7 @@ public class Main {
 
        eigenvalue_vector = null;
 
-       System.out.println("min eigenvalue: " + eigenvalue);
+       //System.out.println("min eigenvalue: " + eigenvalue);
 
        eigenvalue = 1.0;
 
@@ -106,5 +104,31 @@ public class Main {
         } while (spectral_data.getEpsilon() > spectral_data.getEpsilonMargin());
 
         spectral_data.getEigenvector().print();
+
+        graph_data.setEigenvalues(spectral_data.getEigenvector());
+
+        spectral_data.sortEigenvector();
+        System.out.println();
+        spectral_data.getEigenvector().print();
+
+
+
+        int divide = 20000;
+        double margin = 0.1;
+
+        graph_data.setParameters(divide,margin);
+
+        graph_data.assignGroups(spectral_data);
+
+
+
+
+         graph_data.printNodes();
+
+         VisualiseGraph.Visualise(graph_data);
+
+
+
+
     }
 }

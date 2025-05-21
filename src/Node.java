@@ -5,6 +5,8 @@ public class Node
     private final int x, y, nr;
     private ArrayList<Integer> adjacency_list;
     private int group;
+    private double eigenvalue;
+    private int connected_nodes;
 
     public Node(int x, int y, int group, int nr)
     {
@@ -24,11 +26,17 @@ public class Node
     public void setAdjacencyList(ArrayList<Integer> adjacency_list) {
         this.adjacency_list = adjacency_list;
     }
+    public double getEigenvalue() { return eigenvalue; }
+    public void setEigenvalue(double eigenvalue) { this.eigenvalue = eigenvalue; }
 
     public void printNode()
     {
-        System.out.println(nr + ": " + x + " x " + y + " group: " + group);
+        System.out.println(nr + ": " + x + " x " + y + " group: " + group + " eigenvalue: " + eigenvalue);
     }
+
+    public int getConnectedNodes() { return adjacency_list.size(); }
+
+
 
     public void printAdjacencyList()
     {

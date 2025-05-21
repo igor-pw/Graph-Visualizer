@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class SpectralData
 {
@@ -9,6 +10,8 @@ public class SpectralData
     private final CSR laplace_matrix;
     private final Vector degree_vector;
     private Vector eigenvector;
+    private Vector nodeIndices;
+
 
     public SpectralData(ArrayList<Node> nodes)
     {
@@ -51,6 +54,10 @@ public class SpectralData
         laplace_matrix.getColIndex().trimToSize();
         laplace_matrix.getRowPointer().trimToSize();
     }
+    public Vector getNodeIndices() {
+        return nodeIndices;
+    }
+
 
     public CSR getLaplaceMatrix() { return laplace_matrix; }
     public Vector getDegreeVector() { return degree_vector; }
@@ -146,6 +153,26 @@ public class SpectralData
             calculateEigenvector(velocity, prev_epsilon, depth);
         }
     }
+
+    public void sortEigenvector() {
+        ArrayList<EigenvaluePair> razem = new ArrayList<>();
+        for (int i = 0; i < eigenvector.size(); i++) {
+            razem.add(new EigenvaluePair(eigenvector.get(i), i));
+        }
+
+        Collections.sort(razem);
+
+        Vector sortedEigenvector = new Vector(eigenvector.size());
+        Vector nodeIndices = new Vector(eigenvector.size());
+
+        for (EigenvaluePair dwie : razem) {
+            sortedEigenvector.add(dwie.getValue());
+            nodeIndices.add((double) dwie.getNodeIndex());
+        }
+        this.eigenvector = sortedEigenvector;
+        this.nodeIndices = nodeIndices;
+    }
+
 
     public void printDegreeVector(){
         for(Double value : degree_vector){
