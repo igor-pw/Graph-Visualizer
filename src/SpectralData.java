@@ -37,10 +37,8 @@ public class SpectralData
 
             for(int i = 0; i < node.getAdjacencyList().size(); i++)
             {
-
                 laplace_matrix.getValues().add(-1.0);
                 laplace_matrix.getColIndex().add(node.getAdjacencyList().get(i));
-
             }
 
             laplace_matrix.getRowPointer().add(prev_row_counter + node.getAdjacencyList().size() + 1);
