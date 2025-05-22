@@ -2,6 +2,7 @@ import java.util.ArrayList;
 
 public class Vector extends ArrayList<Double> {
     private double norm;
+    private int nr;
 
     public Vector() {
         super();

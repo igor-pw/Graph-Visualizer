@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class Matrix {
 
@@ -24,6 +25,11 @@ public class Matrix {
 
     public ArrayList<ArrayList<Double>> getValues() { return values; }
     public int getSize() { return size; }
+
+    public void setRow(int row, ArrayList<Integer> row_values) {
+        this.values.set(row, (ArrayList<Double>) row_values.stream().map(i -> i.doubleValue()).collect(Collectors.toList()));
+    }
+
 
     public void setValues(ArrayList<ArrayList<Double>> values) { this.values = values; }
 
