@@ -381,5 +381,25 @@ public class GraphData
         return count;
     }
 
+    public double ratio(){
+
+        double before = 0;
+        double after = 0;
+        for(int i = 0; i < nodes.size(); i++){
+            int node = i;
+            for(int j = 0; j < nodes.get(i).getConnectedNodes(); j++){
+                int nb_node = nodes.get(i).getAdjacencyList().get(j);
+                if(nb_node > node){
+                    before++;
+                    if(nodes.get(nb_node).getGroup() == nodes.get(node).getGroup()){
+                        after++;
+                    }
+                }
+
+            }
+        }
+        return 1- after/before;
+    }
+
 
 }

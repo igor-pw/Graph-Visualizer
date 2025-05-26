@@ -113,7 +113,7 @@ public class Main {
 
 
 
-        int divide = 1000;
+        int divide = 2;
         double margin = 0.1;
 
         graph_data.setParameters(divide,margin);
@@ -126,6 +126,8 @@ public class Main {
          //graph_data.printNodes();
 
          //VisualiseGraph.Visualise(graph_data);
+
+        System.out.println("Stosunek usuniętych połączeń: " + graph_data.ratio());
 
 
 
