@@ -113,7 +113,7 @@ public class Main {
 
 
 
-        int divide = 20000;
+        int divide = 15000;
         double margin = 0.1;
 
         graph_data.setParameters(divide,margin);
@@ -123,9 +123,9 @@ public class Main {
 
 
 
-         graph_data.printNodes();
+         //graph_data.printNodes();
 
-         VisualiseGraph.Visualise(graph_data);
+         //VisualiseGraph.Visualise(graph_data);
 
 
 

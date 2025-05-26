@@ -129,11 +129,20 @@ public class GraphData
         }
 
         seeds[divide-1] = node;
-        System.out.println("Node: " + node + " len: " + max_len);
+      //  System.out.println("Node: " + node + " len: " + max_len);
+
+        int[] gr_count = new int[divide];
 
         for(int i = 0; i < divide; i++) {
+            if(nodes.get(seeds[i]).getGroup() != -1) {
+                //System.out.println("Node: " + nodes.get(seeds[i]).getNr() + " ma juz grupe");
+            }
             nodes.get(seeds[i]).setGroup(i);
+            gr_count[i]++;
+
         }
+
+        System.out.println(nodes.get(3).getGroup());
 
         for(int i = 0; i < nodes.size(); i++) {
             if(nodes.get(i).getConnectedNodes() > max_len){
@@ -141,6 +150,7 @@ public class GraphData
             }
         }
         max_len ++;
+        System.out.println(nodes.get(3).getGroup());
 
         ArrayList<ArrayList<ArrayList<Integer>>> que = new ArrayList<>();
         for(int i = 0; i < divide; i++) {
@@ -149,6 +159,7 @@ public class GraphData
                 que.get(i).add(new ArrayList<>());
             }
         }
+        System.out.println(nodes.get(3).getGroup());
 
 
 
@@ -157,16 +168,44 @@ public class GraphData
         for(int i = 0; i < divide; i++) {
             addToQue(que.get(i), seeds[i]);
         }
+        System.out.println(nodes.get(3).getGroup());
 
         for(int i = 0; i <max_gr_size; i++) {
             for(int j = 0; j < divide; j++) {
-                add_from_que(que.get(j), j, max_len);
+                add_from_que(que.get(j), j, max_len, gr_count);
             }
+        }
+        System.out.println(nodes.get(3).getGroup());
+
+        addFreeNodes(gr_count);
+
+        for(Node cnode : nodes ){
+            if(cnode.getGroup() == -1){
+                System.out.println("Node: " + cnode.getNr() + " NIe ma grupy " );
+            }
+        }
+
+        for(int i = 0; i < divide; i++) {
+            int gr_size  = 0;
+            for(int j = 0; j < nodes.size(); j++) {
+                if(nodes.get(j).getGroup() == i){
+                    gr_size++;
+                }
+                else if(nodes.get(j).getGroup() == -1){
+
+                }
+            }
+            if(gr_count[i] != gr_size ) {
+                System.out.println("Grupa " + i + " cos nie tak");
+            }
+            //System.out.println("Grupa " + i + ": " + gr_count[i]);
         }
 
 
 
     }
+
+
 
     void addToQue(ArrayList<ArrayList<Integer>> que, int node){
         for(int i =0; i< nodes.get(node).getConnectedNodes(); i++){
@@ -176,7 +215,7 @@ public class GraphData
         }
     }
 
-    void add_from_que(ArrayList<ArrayList<Integer>> que, int group, int max_len){
+    void add_from_que(ArrayList<ArrayList<Integer>> que, int group, int max_len, int[] gr_count){
         int succes = 0;
         for(int i = 0 ; i < max_len && succes != 1; i++){
             if(que.get(i).size() > 0){
@@ -184,6 +223,7 @@ public class GraphData
                 if(node != -1){
                     addToQue(que, node);
                     nodes.get(node).setGroup(group);
+                    gr_count[group]++;
                     ++succes;
                     return;
                 }
@@ -202,16 +242,26 @@ public class GraphData
        return -1;
     }
 
-    public void addFreeNodes(){
+    public void addFreeNodes(int[] gr_count){
         int fixed = 0;
         while(fixed != 1){
             fixed = 1;
             for(Node node : nodes) {
                 if(node.getGroup() == -1) {
-                    int smallest_gr = 99999999;
+                    int smallest_gr = 100000;
                     int node_nr = -1;
-                    for(int i = 0; i < node.getConnectedNodes(); i++) {
-                      //dodam jeszcze chyba jednego arraylista do ilosci wiezchołków w grupach
+                    for(int i = 0; i < node.getConnectedNodes(); i++){
+                        int adj_node = node.getAdjacencyList().get(i);
+                        int gr = nodes.get(adj_node).getGroup();
+                        if(gr != -1 && gr_count[gr] < smallest_gr) {
+                            smallest_gr = gr_count[nodes.get(adj_node).getGroup()];
+                            node_nr = adj_node;
+                        }
+                    }
+                    if(smallest_gr != 100000 && node_nr != -1) {
+                        node.setGroup(smallest_gr);
+                        fixed = 0;
+                        gr_count[smallest_gr]++;
                     }
                 }
             }
