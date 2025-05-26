@@ -103,17 +103,17 @@ public class Main {
             spectral_data.calculateEigenvector(velocity, 0.0, 0);
         } while (spectral_data.getEpsilon() > spectral_data.getEpsilonMargin());
 
-        spectral_data.getEigenvector().print();
+       // spectral_data.getEigenvector().print();
 
         graph_data.setEigenvalues(spectral_data.getEigenvector());
 
         spectral_data.sortEigenvector();
         System.out.println();
-        spectral_data.getEigenvector().print();
+        //spectral_data.getEigenvector().print();
 
 
 
-        int divide = 15000;
+        int divide = 1000;
         double margin = 0.1;
 
         graph_data.setParameters(divide,margin);
