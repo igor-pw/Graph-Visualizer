@@ -54,4 +54,8 @@ public class Node
 
         System.out.println();
     }
+
+    public boolean isVisible(int minX, int maxX, int minY, int maxY) {
+        return x >= minX && x <= maxX && y >= minY && y <= maxY;
+    }
 }

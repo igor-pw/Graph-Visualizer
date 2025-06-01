@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Stack;
 
 public class GraphData
 {
@@ -368,7 +369,26 @@ public class GraphData
         return res;
     }
 
-    public int dfs(int[] hbs, int node, int gr){
+    public int dfs(int[] hbs, int start, int gr) {
+        int count = 0;
+        Stack<Integer> stack = new Stack<>();
+        stack.push(start);
+        hbs[start] = 1;
+        while (!stack.isEmpty()) {
+            int node = stack.pop();
+            count++;
+            for (int i = 0; i < nodes.get(node).getConnectedNodes(); i++) {
+                int nb = nodes.get(node).getAdjacencyList().get(i);
+                if (nodes.get(nb).getGroup() == gr && hbs[nb] == 0) {
+                    hbs[nb] = 1;
+                    stack.push(nb);
+                }
+            }
+        }
+        return count;
+    }
+
+    /*public int dfs(int[] hbs, int node, int gr){
         int count = 1;
         hbs[node]=1;
         for(int i =0; i<nodes.get(node).getConnectedNodes(); i++){
@@ -379,7 +399,7 @@ public class GraphData
         }
 
         return count;
-    }
+    }*/
 
     public double ratio(){
 

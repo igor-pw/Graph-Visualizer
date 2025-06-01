@@ -103,7 +103,7 @@ public class Main {
             spectral_data.calculateEigenvector(velocity, 0.0, 0);
         } while (spectral_data.getEpsilon() > spectral_data.getEpsilonMargin());
 
-       // spectral_data.getEigenvector().print();
+        //spectral_data.getEigenvector().print();
 
         graph_data.setEigenvalues(spectral_data.getEigenvector());
 
@@ -111,26 +111,19 @@ public class Main {
         System.out.println();
         //spectral_data.getEigenvector().print();
 
-
-
-        int divide = 2;
+        int divide = 1000;
         double margin = 0.1;
+
+        ColorGenerator.setGroupCount(divide);
 
         graph_data.setParameters(divide,margin);
 
         graph_data.assignGroups(spectral_data);
 
+        //graph_data.printNodes();
 
-
-
-         //graph_data.printNodes();
-
-         //VisualiseGraph.Visualise(graph_data);
+         VisualiseGraph.Visualise(graph_data);
 
         System.out.println("Stosunek usuniętych połączeń: " + graph_data.ratio());
-
-
-
-
     }
 }

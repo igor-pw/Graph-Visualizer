@@ -17,7 +17,7 @@ public class SpectralData
     {
         this.laplace_matrix = new CSR();
         this.degree_vector = new Vector(nodes.size());
-        this.eigenvector = new Vector();
+        this.eigenvector = new Vector(nodes.size());
 
         this.learning_rate = 0.001;
         this.momentum = 0.8;
@@ -91,64 +91,50 @@ public class SpectralData
         residual_vector = null;
     }
 
-    public void calculateEigenvector(Vector velocity, double prev_epsilon, int depth)
-    {
-        this.eigenvector.print();
-
-        Vector residual_vector = this.eigenvector.multiplyByCSR(laplace_matrix);
-
-        Vector gradient_vector = residual_vector.multiplyByCSR(laplace_matrix);
-
-        for(int i = 0; i < gradient_vector.size(); i++){
-            gradient_vector.set(i, gradient_vector.get(i)*2);
+    public void calculateEigenvector(Vector velocity, double prev_epsilon, int depth) {
+        // Inicjalizacja velocity zerami, jeśli jest pusty
+        if (velocity.size() != this.eigenvector.size()) {
+            velocity.clear();
+            for (int i = 0; i < this.eigenvector.size(); i++) {
+                velocity.add(0.0);
+            }
         }
 
-        residual_vector.clear();
-        residual_vector.addAll(this.eigenvector);
-        this.eigenvector.norm();
-
-        for(int i = 0; i < velocity.size(); i++)
-        {
-            velocity.set(i, this.momentum*velocity.get(i) + (1.0 - this.momentum) * gradient_vector.get(i));
-            this.eigenvector.set(i, this.eigenvector.get(i) - this.learning_rate*velocity.get(i));
+        Vector old_eigenvector = new Vector(this.eigenvector.size());
+        for (int i = 0; i < this.eigenvector.size(); i++) {
+            old_eigenvector.add(this.eigenvector.get(i));
         }
 
-        /*
-        for(double value : velocity) {
-            value = this.momentum*value + (1.0 - this.momentum)*gradient_vector.get(velocity.indexOf(value));
-            this.eigenvector.set(velocity.indexOf(value), this.eigenvector.get(velocity.indexOf(value)) - this.learning_rate*value);
-        }*/
+        Vector r_vec = this.eigenvector.multiplyByCSR(laplace_matrix);
+        Vector gradient = r_vec.multiplyByCSR(laplace_matrix);
+        for (int i = 0; i < gradient.size(); i++)
+            gradient.set(i, gradient.get(i) * 2);
 
-        this.eigenvector.divide(this.eigenvector.getNorm());
+        double vec_norm = 0.0;
+        for (int i = 0; i < this.eigenvector.size(); i++) {
+            velocity.set(i, this.momentum * velocity.get(i) + (1.0 - this.momentum) * gradient.get(i));
+            this.eigenvector.set(i, this.eigenvector.get(i) - this.learning_rate * velocity.get(i));
+            vec_norm += this.eigenvector.get(i) * this.eigenvector.get(i);
+        }
+
+        vec_norm = Math.sqrt(vec_norm);
+        this.eigenvector.divide(vec_norm);
+
         this.epsilon = 0.0;
-
-        for(int i = 0; i < this.eigenvector.size(); i++) {
-            this.epsilon += Math.pow(eigenvector.get(i) - residual_vector.get(i), 2);
-        }
-
+        for (int i = 0; i < this.eigenvector.size(); i++)
+            this.epsilon += Math.pow(this.eigenvector.get(i) - old_eigenvector.get(i), 2);
         this.epsilon = Math.sqrt(this.epsilon);
 
-        System.out.println("depth: " + depth + " epsilon: " + this.epsilon + " prev_epsilon: " + prev_epsilon + " epsilon_margin: " + this.epsilon_margin);
-
-        residual_vector = null;
-        gradient_vector = null;
-
-        if(this.epsilon < Math.pow(10, -3) && this.epsilon >= prev_epsilon) {
-            //System.out.println("Koniec");
+        if (this.epsilon < Math.pow(10, -3) && this.epsilon >= prev_epsilon)
+        {
             this.epsilon_margin = Math.pow(10, -3);
             return;
         }
 
-        /*else if(this.epsilon == prev_epsilon) {
-            this.epsilon_margin = Math.pow(10, 3);
-            return;
-        }*/
-
         prev_epsilon = this.epsilon;
 
-        if(this.epsilon > this.epsilon_margin && ++depth < 2000) {
-            System.out.println("Dalej");
-            calculateEigenvector(velocity, prev_epsilon, depth);
+        if (this.epsilon > this.epsilon_margin && depth + 1 < 2000) {
+            calculateEigenvector(velocity, prev_epsilon, depth + 1);
         }
     }
 
