@@ -7,6 +7,9 @@ public class Node
     private int group;
     private double eigenvalue;
     private int connected_nodes;
+    private int gr_gain;
+    private int gain;
+    private boolean is_leaf = false;
 
     public Node(int x, int y, int group, int nr)
     {
@@ -28,6 +31,11 @@ public class Node
     }
     public double getEigenvalue() { return eigenvalue; }
     public void setEigenvalue(double eigenvalue) { this.eigenvalue = eigenvalue; }
+    public void setGain(int gain, int gr_gain){this.gain = gain; this.gr_gain = gr_gain;}
+    public void setLeaf(boolean leaf){this.is_leaf = leaf;}
+    public boolean isLeaf(){return is_leaf;}
+    public int getGain(){return gain;}
+    public int getGrGain(){return gr_gain;}
 
     public void printNode()
     {
