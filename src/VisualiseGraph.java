@@ -1,4 +1,3 @@
-
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
@@ -9,7 +8,7 @@ import java.util.Objects;
 
 public class VisualiseGraph extends JFrame {
 
-    public static void Visualise(GraphData graphdata) {
+    public static void Visualise() {
         JFrame Okno = new JFrame("Graf");
         Okno.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Okno.setSize(1600, 950);
@@ -17,25 +16,35 @@ public class VisualiseGraph extends JFrame {
         // Panel główny z BorderLayout
         JPanel mainPanel = new JPanel(new BorderLayout());
 
-        // Panel kontrolny na górze
-        JPanel controlPanel = createControlPanel(graphdata, Okno);
+        // Panel kontrolny na górze - przekazujemy referencję do mainPanel
+        JPanel controlPanel = createControlPanel(mainPanel, Okno);
         mainPanel.add(controlPanel, BorderLayout.NORTH);
 
-        // Dodanie panelu do rysowania
-        GraphPanel panel = new GraphPanel(graphdata);
-
-        // Dodanie suwaka
-        JScrollPane scrollPane = new JScrollPane(panel);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-
-        mainPanel.add(scrollPane, BorderLayout.CENTER);
+        // Początkowo dodaj tylko panel z komunikatem
+        JPanel placeholderPanel = createPlaceholderPanel();
+        mainPanel.add(placeholderPanel, BorderLayout.CENTER);
 
         Okno.add(mainPanel);
         Okno.setVisible(true);
     }
 
-    private static JPanel createControlPanel(GraphData currentGraphData, JFrame parentWindow) {
+    private static JPanel createPlaceholderPanel() {
+        JPanel placeholder = new JPanel(new BorderLayout());
+        placeholder.setBackground(Color.WHITE);
+
+        JLabel messageLabel = new JLabel("<html><div style='text-align: center;'>" +
+                "<h2>Witaj w wizualizatorze grafów!</h2>" +
+                "<p>Wybierz plik i naciśnij jeden z przycisków powyżej,<br>" +
+                "aby załadować i zwizualizować graf.</p>" +
+                "</div></html>", SwingConstants.CENTER);
+        messageLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        messageLabel.setForeground(Color.GRAY);
+
+        placeholder.add(messageLabel, BorderLayout.CENTER);
+        return placeholder;
+    }
+
+    private static JPanel createControlPanel(JPanel mainPanel, JFrame parentWindow) {
         JPanel controlPanel = new JPanel(new GridBagLayout());
         controlPanel.setBorder(BorderFactory.createTitledBorder("Opcje analizy grafów"));
         GridBagConstraints gbc = new GridBagConstraints();
@@ -114,16 +123,16 @@ public class VisualiseGraph extends JFrame {
                 if (newData != null) {
                     processedData[0] = newData;
                     visualizeDividedButton.setEnabled(true);
-                    // Aktualizuj obecne okno zamiast otwierania nowego
-                    updateCurrentWindow(parentWindow, newData);
+                    // Dodaj panel z grafem
+                    insertGraphPanel(mainPanel, newData, parentWindow);
                 }
             }
         });
 
         visualizeDividedButton.addActionListener(e -> {
             if (processedData[0] != null) {
-                // Aktualizuj obecne okno zamiast otwierania nowego
-                updateCurrentWindow(parentWindow, processedData[0]);
+                // Dodaj panel z grafem
+                insertGraphPanel(mainPanel, processedData[0], parentWindow);
             } else {
                 JOptionPane.showMessageDialog((Component) e.getSource(),
                         "Najpierw musisz przetworzyć graf używając 'Podziel i zwizualizuj graf'",
@@ -137,8 +146,8 @@ public class VisualiseGraph extends JFrame {
                 if (newData != null) {
                     processedData[0] = newData;
                     visualizeDividedButton.setEnabled(true);
-                    // Aktualizuj obecne okno
-                    updateCurrentWindow(parentWindow, newData);
+                    // Dodaj panel z grafem
+                    insertGraphPanel(mainPanel, newData, parentWindow);
                     JOptionPane.showMessageDialog((Component) e.getSource(),
                             "Analiza zakończona pomyślnie!\nStosunek usuniętych połączeń: " +
                                     String.format("%.4f", newData.ratio()),
@@ -153,33 +162,28 @@ public class VisualiseGraph extends JFrame {
         return controlPanel;
     }
 
-    private static void updateCurrentWindow(JFrame window, GraphData newGraphData) {
+    private static void insertGraphPanel(JPanel mainPanel, GraphData graphData, JFrame parentWindow) {
         SwingUtilities.invokeLater(() -> {
-            // Usuń obecną zawartość
-            window.getContentPane().removeAll();
+            // Usuń obecny panel centralny (placeholder lub stary graf)
+            Component centerComponent = ((BorderLayout) mainPanel.getLayout()).getLayoutComponent(BorderLayout.CENTER);
+            if (centerComponent != null) {
+                mainPanel.remove(centerComponent);
+            }
 
-            // Panel główny z BorderLayout
-            JPanel mainPanel = new JPanel(new BorderLayout());
+            // Utwórz nowy panel z grafem - TUTAJ UŻYWAMY GraphData do stworzenia GraphPanel
+            GraphPanel graphPanel = new GraphPanel(graphData);  // GraphPanel przyjmuje GraphData
 
-            // Panel kontrolny na górze (z nowymi danymi)
-            JPanel controlPanel = createControlPanel(newGraphData, window);
-            mainPanel.add(controlPanel, BorderLayout.NORTH);
-
-            // Nowy panel do rysowania z nowymi danymi
-            GraphPanel panel = new GraphPanel(newGraphData);
-
-            // Dodanie suwaka
-            JScrollPane scrollPane = new JScrollPane(panel);
+            // Dodaj scroll pane z nowym panelem grafu
+            JScrollPane scrollPane = new JScrollPane(graphPanel);
             scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
+            // Dodaj do centrum głównego panelu
             mainPanel.add(scrollPane, BorderLayout.CENTER);
 
-            window.add(mainPanel);
-
             // Odśwież okno
-            window.revalidate();
-            window.repaint();
+            mainPanel.revalidate();
+            mainPanel.repaint();
         });
     }
 

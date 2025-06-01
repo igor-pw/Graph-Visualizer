@@ -3,7 +3,7 @@ import java.util.Objects;
 public class Main {
 
     public static void main(String[] args) {
-
+/*
         int iterations = 57;
 
         String file_path = args[0];
@@ -121,9 +121,9 @@ public class Main {
         graph_data.assignGroups(spectral_data);
 
         //graph_data.printNodes();
+*/
+         VisualiseGraph.Visualise();
 
-         VisualiseGraph.Visualise(graph_data);
-
-        System.out.println("Stosunek usuniętych połączeń: " + graph_data.ratio());
+        //System.out.println("Stosunek usuniętych połączeń: " + graph_data.ratio());
     }
 }

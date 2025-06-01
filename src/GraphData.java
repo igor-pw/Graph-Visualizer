@@ -18,6 +18,14 @@ public class GraphData
         this.groups = groups;
     }
 
+    public GraphData() {
+        this.nodes = new ArrayList<>();
+        this.adjacency_matrix = new ArrayList<>();
+        this.groups = 0;
+    }
+
+
+
     public int getGroups() { return this.groups; }
 
     public void printNodes()
@@ -40,7 +48,7 @@ public class GraphData
     {
         for(int i = 0; i < nodes.size(); i++) {
             nodes.get(i).setEigenvalue(eigenvalues.get(i));
-            
+
         }
     }
 
