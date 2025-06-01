@@ -71,7 +71,8 @@ public class GraphPanel extends JPanel {
 
             for (Integer neighborIdx : node.getAdjacencyList()) {
                 Node neighbor = graphdata.getNodes().get(neighborIdx);
-                if (node.getNr() < neighbor.getNr()) {
+                if (node.getNr() < neighbor.getNr() && group == neighbor.getGroup() && group >= 0) {
+
                     int x2 = 20 * neighbor.getY() + 10;
                     int y2 = 20 * neighbor.getX() + 10;
                     if (group >= 0) {
