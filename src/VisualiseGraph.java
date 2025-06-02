@@ -74,30 +74,44 @@ public class VisualiseGraph extends JFrame {
         });
         controlPanel.add(chooseFileButton, gbc);
 
-        // Trzecia linia - przyciski akcji
+
+
+
+// Tr   zecia linia - przyciski akcji
         gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 1;
-        JToggleButton divideAndVisualizeButton = new JToggleButton("Podziel i zwizualizuj graf");
-        divideAndVisualizeButton.addActionListener(e -> {
-            if (divideAndVisualizeButton.isSelected()) {
-                divideAndVisualizeButton.setText("Zwizualizuj podzielony graf");
-            } else {
-                divideAndVisualizeButton.setText("Podziel i zwizualizuj graf");
-            }
-        });
-        controlPanel.add(divideAndVisualizeButton, gbc);
 
-
-
-        gbc.gridx = 1;
-        JToggleButton formatToggleButton = new JToggleButton("Format: Tekstowy");
+        JToggleButton formatToggleButton = new JToggleButton("Format: csrrg");
         formatToggleButton.addActionListener(e -> {
             if (formatToggleButton.isSelected()) {
                 formatToggleButton.setText("Format: Binarny");
+
             } else {
                 formatToggleButton.setText("Format: Tekstowy");
             }
         });
+        formatToggleButton.setEnabled(false);
         controlPanel.add(formatToggleButton, gbc);
+
+        gbc.gridx = 1;
+        JToggleButton divideAndVisualizeButton = new JToggleButton("Podziel i zwizualizuj graf");
+        divideAndVisualizeButton.addActionListener(e -> {
+            if (divideAndVisualizeButton.isSelected()) {
+                divideAndVisualizeButton.setText("Zwizualizuj podzielony graf");
+                formatToggleButton.setEnabled(true);
+                formatToggleButton.setSelected(true);
+                formatToggleButton.setText("Format: Binarny");
+                marginField.setEnabled(false);
+                groupField.setEnabled(false);
+
+            } else {
+                divideAndVisualizeButton.setText("Podziel i zwizualizuj graf");
+                formatToggleButton.setEnabled(false);
+                formatToggleButton.setText("Format: csrrg");
+                marginField.setEnabled(true);
+                groupField.setEnabled(true);
+            }
+        });
+        controlPanel.add(divideAndVisualizeButton, gbc);
 
         gbc.gridx = 3;
         JButton runButton = new JButton("RUN");
@@ -113,17 +127,33 @@ public class VisualiseGraph extends JFrame {
 
 
         runButton.addActionListener(e -> {
-            if (validateInputs(filePathField, marginField)) {
-                GraphData newData = processGraph(filePathField, marginField, groupField);
-                if (newData != null) {
-                    processedData[0] = newData;
+            if (validateInputs(filePathField, marginField, formatToggleButton, divideAndVisualizeButton)) {
+                if (!divideAndVisualizeButton.isSelected()) {
+                    System.out.println("Podziel i zwizualizuj graf");
 
-                    // Dodaj panel z grafem
-                    insertGraphPanel(mainPanel, newData, parentWindow);
-                    JOptionPane.showMessageDialog((Component) e.getSource(),
+                    GraphData newData = processGraph(filePathField, marginField, groupField);
+                    if (newData != null) {
+                     processedData[0] = newData;
+
+                        // Dodaj panel z grafem
+                        insertGraphPanel(mainPanel, newData, parentWindow);
+                        JOptionPane.showMessageDialog((Component) e.getSource(),
                             "Analiza zakończona pomyślnie!\nStosunek usuniętych połączeń: " +
                                     String.format("%.4f", newData.ratio()),
                             "Sukces", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                }
+                else{
+                    GraphData newData = visualiseGraph(filePathField);
+                    if (newData != null) {
+                        processedData[0] = newData;
+
+                        // Dodaj panel z grafem
+                        insertGraphPanel(mainPanel, newData, parentWindow);
+                        JOptionPane.showMessageDialog((Component) e.getSource(),
+                                "Wizualizacja zakończona pomyślnie ",
+                                "Sukces", JOptionPane.INFORMATION_MESSAGE);
+                    }
                 }
             }
         });
@@ -157,7 +187,7 @@ public class VisualiseGraph extends JFrame {
         });
     }
 
-    private static boolean validateInputs(JTextField filePathField, JTextField marginField) {
+    private static boolean validateInputs(JTextField filePathField, JTextField marginField, JToggleButton fileType, JToggleButton mode ) {
         // Sprawdź ścieżkę pliku
         String filePath = filePathField.getText().trim();
         if (filePath.isEmpty()) {
@@ -168,6 +198,14 @@ public class VisualiseGraph extends JFrame {
         File file = new File(filePath);
         if (!file.exists() || !file.isFile()) {
             JOptionPane.showMessageDialog(null, "Wybrany plik nie istnieje", "Błąd", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if ( (mode.isSelected() && filePath.endsWith(".csrrg")) || (mode.isSelected() && (filePath.endsWith(".txt")) && fileType.isSelected()) || (mode.isSelected() && filePath.endsWith(".bin") && !fileType.isSelected())) {
+            JOptionPane.showMessageDialog(null, "Zły format pliku do wykonywanych akcji", "Błąd", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if ( !mode.isSelected() && !filePath.endsWith(".csrrg") ) {
+            JOptionPane.showMessageDialog(null, "Nie poprawny format pliku do podziału", "Błąd", JOptionPane.ERROR_MESSAGE);
             return false;
         }
 
@@ -186,6 +224,34 @@ public class VisualiseGraph extends JFrame {
         return true;
     }
 
+    public static GraphData visualiseGraph(JTextField filePathField) {
+
+        String filePath = filePathField.getText().trim();
+
+
+        GraphData graphData = ParseData.readFile(filePath);
+
+        for (int i = 0; i < Objects.requireNonNull(graphData).getNodes().size(); i++) {
+            graphData.getNodes().get(i).setAdjacencyList(graphData.createAdjacencyList(i));
+        }
+
+        SpectralData spectralData = new SpectralData(graphData.getNodes());
+        spectralData.getDegreeVector().norm();
+
+        if (graphData.getGroups() > 0) {
+            int groups = 0;
+            for (int j = 0; j < graphData.getNodes().size(); j++) {
+                if (graphData.getNodes().get(j).getGroup() == -1 && !graphData.getNodes().get(j).getAdjacencyList().isEmpty()) {
+                    graphData.inintGroups(graphData.getNodes().get(j), groups);
+                    groups++;
+                }
+            }
+            ColorGenerator.setGroupCount(groups);
+            return graphData;
+        }
+        return null;
+    }
+
     private static GraphData processGraph(JTextField filePathField, JTextField marginField, JTextField groupField) {
         try {
             int iterations = 57;
@@ -202,17 +268,6 @@ public class VisualiseGraph extends JFrame {
             SpectralData spectralData = new SpectralData(graphData.getNodes());
             spectralData.getDegreeVector().norm();
 
-            if (graphData.getGroups() > 0) {
-                int groups = 0;
-                for (int j = 0; j < graphData.getNodes().size(); j++) {
-                    if (graphData.getNodes().get(j).getGroup() == -1 && !graphData.getNodes().get(j).getAdjacencyList().isEmpty()) {
-                        graphData.inintGroups(graphData.getNodes().get(j), groups);
-                        groups++;
-                    }
-                }
-                ColorGenerator.setGroupCount(groups);
-                return graphData;
-            }
 
             Vector initialVector = new Vector(spectralData.getDegreeVector().size());
             initialVector = initialVector.createInitialVector(spectralData.getDegreeVector());
