@@ -1,8 +1,5 @@
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.Objects;
 
@@ -31,16 +28,6 @@ public class VisualiseGraph extends JFrame {
     private static JPanel createPlaceholderPanel() {
         JPanel placeholder = new JPanel(new BorderLayout());
         placeholder.setBackground(Color.WHITE);
-
-        JLabel messageLabel = new JLabel("<html><div style='text-align: center;'>" +
-                "<h2>Witaj w wizualizatorze grafów!</h2>" +
-                "<p>Wybierz plik i naciśnij jeden z przycisków powyżej,<br>" +
-                "aby załadować i zwizualizować graf.</p>" +
-                "</div></html>", SwingConstants.CENTER);
-        messageLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-        messageLabel.setForeground(Color.GRAY);
-
-        placeholder.add(messageLabel, BorderLayout.CENTER);
         return placeholder;
     }
 
@@ -55,15 +42,15 @@ public class VisualiseGraph extends JFrame {
         controlPanel.add(new JLabel("Margines (0.0-1.0):"), gbc);
 
         gbc.gridx = 1;
-        JTextField marginField = new JTextField("0.1", 8);
+        JTextField marginField = new JTextField("0.2", 8);
         controlPanel.add(marginField, gbc);
 
         gbc.gridx = 2;
-        controlPanel.add(new JLabel("Liczba grup (2-15000):"), gbc);
+        controlPanel.add(new JLabel("Liczba grup :"), gbc);
 
         gbc.gridx = 3;
-        JSpinner groupSpinner = new JSpinner(new SpinnerNumberModel(1000, 2, 15000, 1));
-        controlPanel.add(groupSpinner, gbc);
+        JTextField groupField = new JTextField("2", 8);
+        controlPanel.add(groupField, gbc);
 
         // Druga linia - wybór pliku
         gbc.gridx = 0; gbc.gridy = 1;
@@ -77,7 +64,7 @@ public class VisualiseGraph extends JFrame {
         JButton chooseFileButton = new JButton("Wybierz plik...");
         chooseFileButton.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setFileFilter(new FileNameExtensionFilter("Pliki tekstowe (*.txt)", "txt"));
+            //fileChooser.setFileFilter(new FileNameExtensionFilter("Pliki tekstowe (*.txt)", "txt"));
 
             int result = fileChooser.showOpenDialog((Component) e.getSource());
             if (result == JFileChooser.APPROVE_OPTION) {
@@ -89,14 +76,19 @@ public class VisualiseGraph extends JFrame {
 
         // Trzecia linia - przyciski akcji
         gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 1;
-        JButton divideAndVisualizeButton = new JButton("Podziel i zwizualizuj graf");
+        JToggleButton divideAndVisualizeButton = new JToggleButton("Podziel i zwizualizuj graf");
+        divideAndVisualizeButton.addActionListener(e -> {
+            if (divideAndVisualizeButton.isSelected()) {
+                divideAndVisualizeButton.setText("Zwizualizuj podzielony graf");
+            } else {
+                divideAndVisualizeButton.setText("Podziel i zwizualizuj graf");
+            }
+        });
         controlPanel.add(divideAndVisualizeButton, gbc);
 
-        gbc.gridx = 1;
-        JButton visualizeDividedButton = new JButton("Zwizualizuj podzielony graf");
-        controlPanel.add(visualizeDividedButton, gbc);
 
-        gbc.gridx = 2;
+
+        gbc.gridx = 1;
         JToggleButton formatToggleButton = new JToggleButton("Format: Tekstowy");
         formatToggleButton.addActionListener(e -> {
             if (formatToggleButton.isSelected()) {
@@ -117,35 +109,15 @@ public class VisualiseGraph extends JFrame {
         final GraphData[] processedData = {null};
 
         // Obsługa przycisków
-        divideAndVisualizeButton.addActionListener(e -> {
-            if (validateInputs(filePathField, marginField)) {
-                GraphData newData = processGraph(filePathField, marginField, groupSpinner);
-                if (newData != null) {
-                    processedData[0] = newData;
-                    visualizeDividedButton.setEnabled(true);
-                    // Dodaj panel z grafem
-                    insertGraphPanel(mainPanel, newData, parentWindow);
-                }
-            }
-        });
 
-        visualizeDividedButton.addActionListener(e -> {
-            if (processedData[0] != null) {
-                // Dodaj panel z grafem
-                insertGraphPanel(mainPanel, processedData[0], parentWindow);
-            } else {
-                JOptionPane.showMessageDialog((Component) e.getSource(),
-                        "Najpierw musisz przetworzyć graf używając 'Podziel i zwizualizuj graf'",
-                        "Błąd", JOptionPane.WARNING_MESSAGE);
-            }
-        });
+
 
         runButton.addActionListener(e -> {
             if (validateInputs(filePathField, marginField)) {
-                GraphData newData = processGraph(filePathField, marginField, groupSpinner);
+                GraphData newData = processGraph(filePathField, marginField, groupField);
                 if (newData != null) {
                     processedData[0] = newData;
-                    visualizeDividedButton.setEnabled(true);
+
                     // Dodaj panel z grafem
                     insertGraphPanel(mainPanel, newData, parentWindow);
                     JOptionPane.showMessageDialog((Component) e.getSource(),
@@ -156,22 +128,20 @@ public class VisualiseGraph extends JFrame {
             }
         });
 
-        // Początkowo wyłącz przycisk wizualizacji podzielonego grafu
-        visualizeDividedButton.setEnabled(false);
+
 
         return controlPanel;
     }
 
     private static void insertGraphPanel(JPanel mainPanel, GraphData graphData, JFrame parentWindow) {
         SwingUtilities.invokeLater(() -> {
-            // Usuń obecny panel centralny (placeholder lub stary graf)
+            // Usuwa obecny panel i daje nowy z wizualizacją
             Component centerComponent = ((BorderLayout) mainPanel.getLayout()).getLayoutComponent(BorderLayout.CENTER);
             if (centerComponent != null) {
                 mainPanel.remove(centerComponent);
             }
 
-            // Utwórz nowy panel z grafem - TUTAJ UŻYWAMY GraphData do stworzenia GraphPanel
-            GraphPanel graphPanel = new GraphPanel(graphData);  // GraphPanel przyjmuje GraphData
+            GraphPanel graphPanel = new GraphPanel(graphData);
 
             // Dodaj scroll pane z nowym panelem grafu
             JScrollPane scrollPane = new JScrollPane(graphPanel);
@@ -216,12 +186,12 @@ public class VisualiseGraph extends JFrame {
         return true;
     }
 
-    private static GraphData processGraph(JTextField filePathField, JTextField marginField, JSpinner groupSpinner) {
+    private static GraphData processGraph(JTextField filePathField, JTextField marginField, JTextField groupField) {
         try {
             int iterations = 57;
             String filePath = filePathField.getText().trim();
             double margin = Double.parseDouble(marginField.getText());
-            int divide = (Integer) groupSpinner.getValue();
+            int divide = Integer.parseInt(groupField.getText());
 
             GraphData graphData = ParseData.readFile(filePath);
 
