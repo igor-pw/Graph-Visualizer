@@ -210,6 +210,7 @@ public class VisualiseGraph extends JFrame {
                         groups++;
                     }
                 }
+                ColorGenerator.setGroupCount(groups);
                 return graphData;
             }
 
