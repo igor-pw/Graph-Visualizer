@@ -93,7 +93,6 @@ public class GraphData
     {
         if (node.getGroup() == -1 && !node.getAdjacencyList().isEmpty())
         {
-            System.out.println("Zmieniono grupe");
             node.setGroup(group_nr);
             for (int i = 0; i < node.getAdjacencyList().size(); i++) {
                 inintGroups(nodes.get(node.getAdjacencyList().get(i)) ,group_nr);

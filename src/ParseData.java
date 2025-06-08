@@ -1,11 +1,97 @@
-import java.io.FileReader;
-import java.io.BufferedReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class ParseData
 {
+
+    public static void convertBinaryToText(String binaryFilePath, String textFilePath) {
+        try (FileInputStream fis = new FileInputStream(binaryFilePath);
+             DataInputStream dis = new DataInputStream(fis);
+             PrintWriter writer = new PrintWriter(new FileWriter(textFilePath))) {
+
+            // Odczytaj dane w tej samej kolejności co zapis w C
+
+            // 1. res (char - 1 bajt)
+            byte res = dis.readByte();
+            writer.print((char)res + " ");
+
+            // 2. parts (int - 4 bajty)
+            int parts = readIntLittleEndian(dis);
+            writer.print(parts + " ");
+
+            // 3. cut_count (int - 4 bajty)
+            int cutCount = readIntLittleEndian(dis);
+            writer.print(cutCount + " ");
+
+            // 4. margin_kept (int - 4 bajty)
+            int marginKept = readIntLittleEndian(dis);
+            writer.println(marginKept);
+
+            // 5. max_vertices (int - 4 bajty)
+            int maxVertices = readIntLittleEndian(dis);
+            writer.println(maxVertices);
+
+            // 6. row_indices
+            int rCount = readIntLittleEndian(dis);
+            for (int i = 0; i < rCount; i++) {
+                int value = readIntLittleEndian(dis);
+                writer.print(value);
+                if (i < rCount - 1) writer.print(";");
+            }
+            writer.println();
+
+            // 7. first_vertices
+            int fCount = readIntLittleEndian(dis);
+            for (int i = 0; i < fCount; i++) {
+                int value = readIntLittleEndian(dis);
+                writer.print(value);
+                if (i < fCount - 1) writer.print(";");
+            }
+            writer.println();
+
+            // 8. vertices_groups
+            long gCount = readLongLittleEndian(dis); // size_t w C to zazwyczaj 8 bajtów na 64-bit
+            for (long i = 0; i < gCount; i++) {
+                int value = readIntLittleEndian(dis);
+                writer.print(value);
+                if (i < gCount - 1) writer.print(";");
+            }
+            writer.println();
+
+            // 9. vertices_ptrs
+            long pCount = readLongLittleEndian(dis); // size_t w C to zazwyczaj 8 bajtów na 64-bit
+            for (long i = 0; i < pCount; i++) {
+                int value = readIntLittleEndian(dis);
+                writer.print(value);
+                if (i < pCount - 1) writer.print(";");
+            }
+            writer.println();
+
+        } catch (IOException e) {
+            System.err.println("Błąd podczas konwersji pliku: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // Pomocnicza metoda do odczytu int w little-endian (standardowy format C)
+    private static int readIntLittleEndian(DataInputStream dis) throws IOException {
+        byte[] bytes = new byte[4];
+        dis.readFully(bytes);
+        return ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt();
+    }
+
+    // Pomocnicza metoda do odczytu long w little-endian (dla size_t)
+    private static long readLongLittleEndian(DataInputStream dis) throws IOException {
+        byte[] bytes = new byte[8];
+        dis.readFully(bytes);
+        return ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getLong();
+    }
+
     public static GraphData readFile(String file_path)
     {
         try(BufferedReader br = new BufferedReader(new FileReader(file_path)))

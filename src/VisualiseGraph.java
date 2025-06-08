@@ -42,7 +42,7 @@ public class VisualiseGraph extends JFrame {
         controlPanel.add(new JLabel("Margines (0.0-1.0):"), gbc);
 
         gbc.gridx = 1;
-        JTextField marginField = new JTextField("0.2", 8);
+        JTextField marginField = new JTextField("0.1", 8);
         controlPanel.add(marginField, gbc);
 
         gbc.gridx = 2;
@@ -84,7 +84,6 @@ public class VisualiseGraph extends JFrame {
         formatToggleButton.addActionListener(e -> {
             if (formatToggleButton.isSelected()) {
                 formatToggleButton.setText("Format: Binarny");
-
             } else {
                 formatToggleButton.setText("Format: Tekstowy");
             }
@@ -109,6 +108,7 @@ public class VisualiseGraph extends JFrame {
                 formatToggleButton.setText("Format: csrrg");
                 marginField.setEnabled(true);
                 groupField.setEnabled(true);
+
             }
         });
         controlPanel.add(divideAndVisualizeButton, gbc);
@@ -119,13 +119,7 @@ public class VisualiseGraph extends JFrame {
         runButton.setOpaque(true);
         controlPanel.add(runButton, gbc);
 
-        // Zmienna do przechowywania przetworzonych danych
-        final GraphData[] processedData = {null};
-
         // Obsługa przycisków
-
-
-
         runButton.addActionListener(e -> {
             if (validateInputs(filePathField, marginField, formatToggleButton, divideAndVisualizeButton)) {
                 if (!divideAndVisualizeButton.isSelected()) {
@@ -133,8 +127,6 @@ public class VisualiseGraph extends JFrame {
 
                     GraphData newData = processGraph(filePathField, marginField, groupField);
                     if (newData != null) {
-                     processedData[0] = newData;
-
                         // Dodaj panel z grafem
                         insertGraphPanel(mainPanel, newData, parentWindow);
                         JOptionPane.showMessageDialog((Component) e.getSource(),
@@ -143,16 +135,28 @@ public class VisualiseGraph extends JFrame {
                             "Sukces", JOptionPane.INFORMATION_MESSAGE);
                     }
                 }
-                else{
-                    GraphData newData = visualiseGraph(filePathField);
-                    if (newData != null) {
-                        processedData[0] = newData;
+                else {
+                    if (formatToggleButton.isSelected()) {
+                        ParseData.convertBinaryToText(filePathField.getText(), "output.txt");
+                        GraphData newData = visualiseGraph("output.txt");
+                        if (newData != null) {
 
-                        // Dodaj panel z grafem
-                        insertGraphPanel(mainPanel, newData, parentWindow);
-                        JOptionPane.showMessageDialog((Component) e.getSource(),
-                                "Wizualizacja zakończona pomyślnie ",
-                                "Sukces", JOptionPane.INFORMATION_MESSAGE);
+                            // Dodaj panel z grafem
+                            insertGraphPanel(mainPanel, newData, parentWindow);
+                            JOptionPane.showMessageDialog((Component) e.getSource(),
+                                    "Wizualizacja zakończona pomyślnie ",
+                                    "Sukces", JOptionPane.INFORMATION_MESSAGE);
+                        }
+                    } else {
+                        GraphData newData = visualiseGraph(filePathField.getText());
+                        if (newData != null) {
+
+                            // Dodaj panel z grafem
+                            insertGraphPanel(mainPanel, newData, parentWindow);
+                            JOptionPane.showMessageDialog((Component) e.getSource(),
+                                    "Wizualizacja zakończona pomyślnie ",
+                                    "Sukces", JOptionPane.INFORMATION_MESSAGE);
+                        }
                     }
                 }
             }
@@ -224,12 +228,9 @@ public class VisualiseGraph extends JFrame {
         return true;
     }
 
-    public static GraphData visualiseGraph(JTextField filePathField) {
+    public static GraphData visualiseGraph(String filePathField) {
 
-        String filePath = filePathField.getText().trim();
-
-
-        GraphData graphData = ParseData.readFile(filePath);
+        GraphData graphData = ParseData.readFile(filePathField);
 
         for (int i = 0; i < Objects.requireNonNull(graphData).getNodes().size(); i++) {
             graphData.getNodes().get(i).setAdjacencyList(graphData.createAdjacencyList(i));
@@ -241,12 +242,12 @@ public class VisualiseGraph extends JFrame {
         if (graphData.getGroups() > 0) {
             int groups = 0;
             for (int j = 0; j < graphData.getNodes().size(); j++) {
-                if (graphData.getNodes().get(j).getGroup() == -1 && !graphData.getNodes().get(j).getAdjacencyList().isEmpty()) {
+                if (graphData.getNodes().get(j).getGroup() == -1 && !graphData.getNodes().get(j).getAdjacencyList().isEmpty() && groups <= graphData.getGroups()) {
                     graphData.inintGroups(graphData.getNodes().get(j), groups);
                     groups++;
                 }
             }
-            ColorGenerator.setGroupCount(groups);
+            ColorGenerator.setGroupCount(graphData.getGroups());
             return graphData;
         }
         return null;
