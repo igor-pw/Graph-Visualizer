@@ -158,12 +158,4 @@ public class SpectralData
     }
 
 
-    public void printDegreeVector(){
-        for(Double value : degree_vector){
-            System.out.print(value + " ");
-        }
-
-        System.out.println();
-    }
-
 }

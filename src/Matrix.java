@@ -26,11 +26,6 @@ public class Matrix {
     public ArrayList<ArrayList<Double>> getValues() { return values; }
     public int getSize() { return size; }
 
-    public void setRow(int row, ArrayList<Integer> row_values) {
-        this.values.set(row, (ArrayList<Double>) row_values.stream().map(i -> i.doubleValue()).collect(Collectors.toList()));
-    }
-
-
     public void setValues(ArrayList<ArrayList<Double>> values) { this.values = values; }
 
     public void createTridiagonalMatrix(Vector alfa_coeffs, Vector beta_coeffs, int size)
@@ -61,17 +56,6 @@ public class Matrix {
         this.values.get(x+1).set(x, -sinus);
     }
 
-    public void printMatrix()
-    {
-        for(ArrayList<Double> row : values)
-        {
-            for(Double value : row) {
-                System.out.print(value + " ");
-            }
-
-            System.out.println();
-        }
-    }
 
     public Matrix multiplyByMatrix(Matrix right_matrix)
       {

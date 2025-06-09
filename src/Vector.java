@@ -2,11 +2,8 @@ import java.util.ArrayList;
 
 public class Vector extends ArrayList<Double> {
     private double norm;
-    private int nr;
 
-    public Vector() {
-        super();
-    }
+
 
     public Vector(int size) {
         super(size);
@@ -63,11 +60,9 @@ public class Vector extends ArrayList<Double> {
         Matrix givens_matrix = new Matrix(tridiagonal_matrix.getSize());
         givens_matrix.createGivensMatrix(tridiagonal_matrix, k);
 
-        //givens_matrix.printMatrix();
 
         Matrix upper_triangular_matrix = givens_matrix.multiplyByMatrix(tridiagonal_matrix);
 
-        //upper_triangular_matrix.printMatrix();
 
         tridiagonal_matrix.setValues(upper_triangular_matrix.getValues());
         upper_triangular_matrix = null;
@@ -98,21 +93,7 @@ public class Vector extends ArrayList<Double> {
     }
 
 
-    /*public void multiplyMatrixByVector(Matrix matrix )
-    {
-        ArrayList<Double> result_vec = new ArrayList<Double>(this.size());
-        double value = 0;
 
-        for(int i = 0; i < this.size(); i++){
-            for(int j = 0; j < this.size(); j++){
-                value += this.get(j)*matrix.getMatrix()[i][j];
-            }
-            result_vec.add(value);
-            value=0;
-        }
-        this.clear();
-        this.addAll(result_vec);
-    }*/
 
     public double multiplyByVec(Vector vector)
     {
@@ -134,13 +115,5 @@ public class Vector extends ArrayList<Double> {
         this.replaceAll(value -> value / coeff);
     }
 
-    public void print()
-    {
-        for(Double value : this) {
-            System.out.print(value + " ");
-        }
-
-        System.out.println();
-    }
 
 }

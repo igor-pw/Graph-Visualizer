@@ -1,25 +1,12 @@
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
+
 
 public class GraphPanel extends JPanel {
 
     private GraphData graphdata;
     private double scale = 1.0;
 
-    // Konstruktor bez parametrów
-    public GraphPanel() {
-        this.graphdata = null;
-        addMouseWheelListener(e -> {
-            if (e.getPreciseWheelRotation() < 0) {
-                scale *= 1.1;
-            } else {
-                scale /= 1.1;
-            }
-            revalidate();
-            repaint();
-        });
-    }
 
     // Konstruktor z parametrem (zachowane dla kompatybilności)
     public GraphPanel(GraphData graphdata) {
@@ -35,12 +22,6 @@ public class GraphPanel extends JPanel {
         });
     }
 
-    // Metoda do ustawienia danych grafu
-    public void setGraphData(GraphData graphdata) {
-        this.graphdata = graphdata;
-        revalidate();
-        repaint();
-    }
 
     @Override
     public Dimension getPreferredSize() {

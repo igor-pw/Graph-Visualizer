@@ -18,31 +18,15 @@ public class GraphData
         this.groups = groups;
     }
 
-    public GraphData() {
-        this.nodes = new ArrayList<>();
-        this.adjacency_matrix = new ArrayList<>();
-        this.groups = 0;
-    }
-
-
 
     public int getGroups() { return this.groups; }
 
-    public void printNodes()
-    {
-        for(Node node : nodes)
-            node.printNode();
-    }
+
 
     public double getNodeEigenvalue(int n){
         return nodes.get(n).getEigenvalue();
     }
 
-    public void printAdjacencyMatrix()
-    {
-        for(ArrayList<Integer> row : adjacency_matrix)
-            System.out.println(row);
-    }
 
     public void setEigenvalues(Vector eigenvalues)
     {
@@ -64,9 +48,7 @@ public class GraphData
         return nodes;
     }
 
-    public ArrayList<ArrayList<Integer>> getAdjacencyMatrix() {
-        return adjacency_matrix;
-    }
+
 
     public ArrayList<Integer> createAdjacencyList(int node_nr)
     {
@@ -82,12 +64,7 @@ public class GraphData
         return adjacency_list;
     }
 
-    public void printAdjacencyList(){
-        for(Node node : nodes) {
-            System.out.printf("Node " + node.getNr() + ":   ");
-            node.printAdjacencyList();
-        }
-    }
+
 
     public void inintGroups(Node node, int group_nr)
     {
@@ -101,15 +78,10 @@ public class GraphData
         }
     }
 
-    public void setMinMax() {
-        this.max = (int)Math.floor((double)nodes.size()/divide*(1+margin));
-        this.min = (int)Math.ceil((double)nodes.size()/divide*(1-margin));
-    }
 
     public void assignGroups(SpectralData spectral_data) {
 
         double div = (double)nodes.size() / divide;
-        System.out.println("div: " + div);
         int[] seeds = new int[divide];
         int tmp = 0;
 
@@ -145,7 +117,7 @@ public class GraphData
         }
 
         seeds[divide-1] = node;
-      //  System.out.println("Node: " + node + " len: " + max_len);
+
 
         int[] gr_count = new int[divide];
 
@@ -156,7 +128,7 @@ public class GraphData
 
         }
 
-        System.out.println(nodes.get(3).getGroup());
+
 
         for(int i = 0; i < nodes.size(); i++) {
             if(nodes.get(i).getConnectedNodes() > max_len){
@@ -164,7 +136,7 @@ public class GraphData
             }
         }
         max_len ++;
-        System.out.println(nodes.get(3).getGroup());
+
 
         ArrayList<ArrayList<ArrayList<Integer>>> que = new ArrayList<>();
         for(int i = 0; i < divide; i++) {
@@ -173,7 +145,7 @@ public class GraphData
                 que.get(i).add(new ArrayList<>());
             }
         }
-        System.out.println(nodes.get(3).getGroup());
+
 
 
 
@@ -182,23 +154,23 @@ public class GraphData
         for(int i = 0; i < divide; i++) {
             addToQue(que.get(i), seeds[i]);
         }
-        System.out.println(nodes.get(3).getGroup());
+
 
         for(int i = 0; i <max_gr_size; i++) {
             for(int j = 0; j < divide; j++) {
                 add_from_que(que.get(j), j, max_len, gr_count);
             }
         }
-        System.out.println(nodes.get(3).getGroup());
+
 
         addFreeNodes(gr_count);
 
 
         for(int i = 0; i < divide; i++) {
-            int gr_size  = 0;
+
             for(int j = 0; j < nodes.size(); j++) {
                 if(nodes.get(j).getGroup() == i){
-                    gr_size++;
+
                 }
                 else if(nodes.get(j).getGroup() == -1){
 
@@ -219,20 +191,6 @@ public class GraphData
         }
 
         int[] dfs_check = dfsCheck(gr_count);
-        for(int i = 0; i < divide; i++){
-            if(dfs_check[i] != gr_count[i]){
-                System.out.println("OJOJ, wygląda na to że gr." + i + " nie jest spójna       "+"dfs: " + dfs_check[i] + " gr_count: " + gr_count[i]);
-            }
-        }
-        for(int i = 0; i < divide; i++){
-            if(gr_count[i] <=1){
-                System.out.println("Womp Womp, gr." + i + "ma za mało wieszchołków :(");
-            }
-        }
-
-
-
-
 
     }
 
@@ -395,18 +353,6 @@ public class GraphData
         return count;
     }
 
-    /*public int dfs(int[] hbs, int node, int gr){
-        int count = 1;
-        hbs[node]=1;
-        for(int i =0; i<nodes.get(node).getConnectedNodes(); i++){
-            int nb = nodes.get(node).getAdjacencyList().get(i);
-            if(nodes.get(nb).getGroup() == gr && hbs[nb] == 0){
-                count += dfs(hbs,nb,gr);
-            }
-        }
-
-        return count;
-    }*/
 
     public double ratio(){
 

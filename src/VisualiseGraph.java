@@ -64,7 +64,8 @@ public class VisualiseGraph extends JFrame {
         JButton chooseFileButton = new JButton("Wybierz plik...");
         chooseFileButton.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
-            //fileChooser.setFileFilter(new FileNameExtensionFilter("Pliki tekstowe (*.txt)", "txt"));
+
+            fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
 
             int result = fileChooser.showOpenDialog((Component) e.getSource());
             if (result == JFileChooser.APPROVE_OPTION) {
@@ -77,7 +78,6 @@ public class VisualiseGraph extends JFrame {
 
 
 
-// Tr   zecia linia - przyciski akcji
         gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 1;
 
         JToggleButton formatToggleButton = new JToggleButton("Format: csrrg");
@@ -123,7 +123,6 @@ public class VisualiseGraph extends JFrame {
         runButton.addActionListener(e -> {
             if (validateInputs(filePathField, marginField, formatToggleButton, divideAndVisualizeButton)) {
                 if (!divideAndVisualizeButton.isSelected()) {
-                    System.out.println("Podziel i zwizualizuj graf");
 
                     GraphData newData = processGraph(filePathField, marginField, groupField);
                     if (newData != null) {

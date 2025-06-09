@@ -37,25 +37,9 @@ public class Node
     public int getGain(){return gain;}
     public int getGrGain(){return gr_gain;}
 
-    public void printNode()
-    {
-        System.out.println(nr + ": " + x + " x " + y + " group: " + group + " eigenvalue: " + eigenvalue);
-    }
+
 
     public int getConnectedNodes() { return adjacency_list.size(); }
 
 
-
-    public void printAdjacencyList()
-    {
-        for(Integer index : adjacency_list){
-            System.out.print(index + ", ");
-        }
-
-        System.out.println();
-    }
-
-    public boolean isVisible(int minX, int maxX, int minY, int maxY) {
-        return x >= minX && x <= maxX && y >= minY && y <= maxY;
-    }
 }
